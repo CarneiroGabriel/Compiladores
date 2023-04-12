@@ -36,11 +36,10 @@ void MainWindow::on_pushButton_clicked()
    cout << text;
 
 
-    Lexico * lex = new Lexico();
+    Lexico * lex = new Lexico( text.c_str());
     Sintatico * sint = new Sintatico();
     Semantico * sem = new Semantico();
 
-    lex->setInput(text.c_str());
 
     try {
         sint->parse(lex, sem);
