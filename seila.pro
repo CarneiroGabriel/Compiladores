@@ -26,7 +26,8 @@ HEADERS += \
     Sintatico.h \
     SyntaticError.h \
     Token.h \
-    mainwindow.h
+    mainwindow.h \
+    semantictable.h
 
 FORMS += \
     mainwindow.ui
