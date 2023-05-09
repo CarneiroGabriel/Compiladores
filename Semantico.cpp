@@ -32,9 +32,11 @@ public:  string tipo;
 
 };
 SemanticTable TabelaSemantica;
-Simbolo simboloVar;
-Simbolo varInit;
+Simbolo simboloVar; // usada pra auxiliar em inserções na tabela
+Simbolo varInit; // usada pra iniciar variavel
+Simbolo auxDeleteTable;// auxiliar para deletar simbolos repetidos da tabela
 list<Simbolo> tabelaSimbolo;
+list<Simbolo> tabelaSimboloAuxDelete;// auxiliar para deletar simbolos repetidos da tabela
 list<Simbolo> tabelaSimboloBkp;
 stack<list<Simbolo>> escopo;
 int contadorEscopo =0;
@@ -42,6 +44,8 @@ int tipoUsado;
 int tipoAtr;
 int tipoOperador;
 int compativel;
+int compativelAtr = 0;
+bool VarExiste;
 stack<list<Simbolo>> tabelaSimbolosEscopo;
 
 int ConverteTipo(string tipo){
@@ -75,12 +79,12 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
             break;
 
         case 2:
-            cout<<"\n escopo variavel:" <<contadorEscopo<<endl;
+            //cout<<"\n escopo variavel:" <<contadorEscopo<<endl;
             for (const Simbolo &simboloFor : tabelaSimbolo){
                 if(lexema == simboloFor.id && escopo.size() == simboloFor.escopo){
                     //disparar erro semantico
-                    cout<<"erro semantico";
-                    throw SemanticError("Erro semantico ", token->getPosition());
+                    //cout<<"erro semantico";
+                    throw SemanticError("Variavel declarada 2 vezes", token->getPosition());
                     break;
                 }else{
                     //inserir registro na lista de simbolos
@@ -101,42 +105,66 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
 
         case 3:
             for (Simbolo simboloFor : tabelaSimbolo){
+                auxDeleteTable = tabelaSimbolo.front();
+                tabelaSimboloAuxDelete.push_front(auxDeleteTable);
                 if(lexema == simboloFor.id && simboloFor.usado){
                     cout<< "variavelfoi usada";
                     tipoUsado = ConverteTipo(simboloVar.tipo);
                 }else if(lexema == simboloFor.id && escopo.size() >= simboloFor.escopo){
                     //tabelaSimbolo.remove(simboloFor);
-                    simboloFor.usado = true;
-                    tipoUsado = ConverteTipo(simboloVar.tipo);
+                    if(auxDeleteTable.id == simboloFor.id  && auxDeleteTable.tipo == simboloFor.tipo  && auxDeleteTable.escopo <= simboloFor.escopo){
+                        simboloFor.usado = true;
+                        tabelaSimboloAuxDelete.pop_front();
+                        tabelaSimboloAuxDelete.push_front(simboloFor);
+                        tipoUsado = ConverteTipo(simboloVar.tipo);
+                    }
+
                     //simboloFor.escopo = contadorEscopo;
-                    tabelaSimbolo.push_front(simboloFor);
-                    break;
+                    //tabelaSimbolo.push_front(simboloFor);
                 }
+                tabelaSimbolo.pop_front();
             }
-                break;
+            tabelaSimbolo.swap(tabelaSimboloAuxDelete);
+            tabelaSimboloAuxDelete.clear();
+            break;
 
         case 4:
             for (Simbolo simboloFor : tabelaSimbolo){
+                auxDeleteTable = tabelaSimbolo.front();
+                tabelaSimboloAuxDelete.push_front(auxDeleteTable);
                 if(lexema == simboloFor.id && escopo.size() >= simboloFor.escopo){
-                    varInit = simboloFor;
+                    if(auxDeleteTable.id == simboloFor.id  && auxDeleteTable.tipo == simboloFor.tipo  && auxDeleteTable.escopo <= simboloFor.escopo){
+                        varInit = simboloFor;
+                        cout<<"to ak "<< varInit.id<<endl;
+                        tipoAtr = ConverteTipo(simboloVar.tipo);
+                        VarExiste = true;
+                        tabelaSimboloAuxDelete.pop_front();
+                    }
+                    /*varInit = simboloFor;
                     cout<<"to ak "<< varInit.id<<endl;
                     tipoAtr = ConverteTipo(simboloVar.tipo);
-                    break;
-                }else{
-                    throw SemanticError("Erro semantico ", token->getPosition());
-                    //lancar exessão
-                    break;
+                    VarExiste = true;
+                    break;*/
                 }
+                tabelaSimbolo.pop_front();
             }
+            tabelaSimbolo.swap(tabelaSimboloAuxDelete);
+            tabelaSimboloAuxDelete.clear();
+            if(VarExiste){
+                VarExiste = false;
                 break;
+            }
+                throw SemanticError("Variavel nao exite", token->getPosition());
+                break;
+
         case 5:
                 //tabelaSimbolo.remove(simboloVar);
-                if(compativel == 0){
+                if(compativel == 0 || compativel == 1 && compativelAtr == 0 || compativelAtr == 1 ){
                 varInit.inicializado = true;
                 tabelaSimbolo.push_front(varInit);
                 break;
                 }else{
-                  throw SemanticError("Erro semantico ", token->getPosition());
+                  throw SemanticError("Tipo incompativel ", token->getPosition());
                 }
                 break;
 
@@ -168,10 +196,20 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                 tabelaSimbolo.push_front(varInit);
                 break;
         case 12:
+                if(TabelaSemantica.resultType(tipoAtr, tipoUsado,tipoOperador) == -1){
+                  throw SemanticError("Tipo imcompativel ", token->getPosition());
+                } else if(TabelaSemantica.resultType(tipoAtr, tipoUsado,tipoOperador) == 1){
+                    compativelAtr = 1;
+                } else{
+                    compativelAtr = 0;
+                }
+
+
                 if( TabelaSemantica.atribType(tipoAtr, tipoUsado) == -1){
-                     throw SemanticError("Erro semantico ", token->getPosition());
+                     throw SemanticError("Tipo imcompativel ", token->getPosition());
                 }else if(TabelaSemantica.atribType(tipoAtr, tipoUsado) == 1){
                      //war
+                     compativel = 1;
                 }else{
                      compativel = 0;
                 };
@@ -182,16 +220,19 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                 tipoOperador = 0;
                 break;
         case 14:
-                tipoOperador = 0;
+                tipoOperador = 1;
                 break;
         case 15:
-                tipoOperador = 0;
+                tipoOperador = 2;
                 break;
         case 16:
-                tipoOperador = 0;
+                tipoOperador = 3;
                 break;
         case 17:
-                tipoOperador = 0;
+                tipoOperador = 4;
+                break;
+        case 22:
+                tipoOperador = 5;
                 break;
 
         case 18:
@@ -200,7 +241,7 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
             tabelaSimbolosEscopo.push(tabelaSimbolo);
             break;
         case 19:
-            tabelaSimboloBkp.swap(tabelaSimbolo);
+            /*tabelaSimboloBkp.swap(tabelaSimbolo);
             tabelaSimbolo.clear();
             for(Simbolo sim : tabelaSimbolo){
                      if(sim.escopo == escopo.size()){
@@ -208,20 +249,102 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                      }
             }
 
-            escopo.pop();
+            escopo.pop();*/
 
             break;
 
         case 20:
-
+            for (const Simbolo &simboloFor : tabelaSimbolo){
+                     if(lexema == simboloFor.id && escopo.size() == simboloFor.escopo){
+                    throw SemanticError("Variavel || funcao declarada 2 vezes", token->getPosition());
+                    break;
+                     }else{
+                    //inserir registro na lista de simbolos
+                    //talvez precisa de um continue para o for
+                    simboloVar.funcao = true;
+                    simboloVar.id = lexema;
+                    simboloVar.escopo = escopo.size();
+                    tabelaSimbolo.push_front(simboloVar);
+                    simboloVar.funcao = false;
+                    break;
+                     }
+            }
+            if(tabelaSimbolo.empty()){
+                     simboloVar.funcao = true;
+                     simboloVar.id = lexema;
+                     simboloVar.escopo = escopo.size();
+                     tabelaSimbolo.push_front(simboloVar);
+                     simboloVar.funcao = false;
+                     break;
+            }
             break;
 
-        case 37:
+        case 21:
+
+            simboloVar = tabelaSimbolo.front();
+            simboloVar.vetor = true;
+            tabelaSimbolo.pop_front();
+            tabelaSimbolo.push_front(simboloVar);
+            simboloVar.vetor = false;
+            break;
+
+        case 23:
+            for (Simbolo simboloFor : tabelaSimbolo){
+                     auxDeleteTable = tabelaSimbolo.front();
+                     tabelaSimboloAuxDelete.push_front(auxDeleteTable);
+                     if(lexema == simboloFor.id && escopo.size() >= simboloFor.escopo && simboloFor.funcao){
+                    if(auxDeleteTable.id == simboloFor.id  && auxDeleteTable.tipo == simboloFor.tipo  && auxDeleteTable.escopo <= simboloFor.escopo){
+                        tipoAtr = ConverteTipo(simboloVar.tipo);
+                        simboloFor.usado = true;
+                        simboloFor.inicializado = true;
+                        VarExiste = true;
+                        tabelaSimboloAuxDelete.pop_front();
+                        tabelaSimboloAuxDelete.push_front(simboloFor);
+                    }
+                     }
+                     tabelaSimbolo.pop_front();
+            }
+            tabelaSimbolo.swap(tabelaSimboloAuxDelete);
+            tabelaSimboloAuxDelete.clear();
+            if(VarExiste){
+                     VarExiste = false;
+                     break;
+            }
+            throw SemanticError("Funcao nao exite", token->getPosition());
+            break;
+
+        case 24:
+            for (Simbolo simboloFor : tabelaSimbolo){
+                     auxDeleteTable = tabelaSimbolo.front();
+                     tabelaSimboloAuxDelete.push_front(auxDeleteTable);
+                     if(lexema == simboloFor.id && escopo.size() >= simboloFor.escopo && simboloFor.vetor){
+                    if(auxDeleteTable.id == simboloFor.id  && auxDeleteTable.tipo == simboloFor.tipo  && auxDeleteTable.escopo <= simboloFor.escopo){
+                        varInit = simboloFor;
+                        tipoAtr = ConverteTipo(simboloVar.tipo);
+                        VarExiste = true;
+                        tabelaSimboloAuxDelete.pop_front();
+                    }
+                     }
+                     tabelaSimbolo.pop_front();
+            }
+            tabelaSimbolo.swap(tabelaSimboloAuxDelete);
+            tabelaSimboloAuxDelete.clear();
+            if(VarExiste){
+                     VarExiste = false;
+                     break;
+            }
+            throw SemanticError("vetor nao exite", token->getPosition());
+            break;
+
+
+
+
+        case 29:
             tabelaSimbolosEscopo.push(tabelaSimbolo);
 
             contadorEscopo = 0;
-            for(Simbolo sim : tabelaSimboloBkp){
-                cout<<sim.tipo<<" "<<sim.id<<" escopo:"<<sim.escopo<<" init:"<<sim.inicializado<<" usada:"<<sim.usado<<endl;
+            for(Simbolo sim : tabelaSimbolo){
+                     cout<<sim.tipo<<" "<<sim.id<<" escopo:"<<sim.escopo<<" init:"<<sim.inicializado<<" usada:"<<sim.usado<<" funcao:"<<sim.funcao<<" vetor:"<<sim.vetor<<" posVetor:"<<sim.posVetor<<endl;
             }
             tabelaSimbolo.clear();
             for(Simbolo sim : tabelaSimbolo){
