@@ -115,3 +115,9 @@ void MainWindow::on_save_clicked()
     file.close();
 }
 
+
+void MainWindow::on_btnTabela_clicked()
+{
+    ui->tabelaSimbolo->setText("Tabela Simbolo");
+}
+

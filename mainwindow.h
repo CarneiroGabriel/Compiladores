@@ -26,6 +26,8 @@ private slots:
 
     void on_save_clicked();
 
+    void on_btnTabela_clicked();
+
 private:
     Ui::MainWindow *ui;
 };
