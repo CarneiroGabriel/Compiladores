@@ -50,8 +50,22 @@ void MainWindow::on_pushButton_clicked()
 
 
     try {
+        ui->setText->setText("");
         sint->parse(lex, sem);
-        ui->setText->setText("compilou");
+        ui->setText->append("compilou");
+        string warning;
+
+        ui->setText->append("------------------------Warning--------------------");
+        for(Warning war : this->sem->listaWar){
+            warning.append(war.id);
+            warning.append("| escopo: ");
+            warning.append(to_string(war.escopo));
+            warning.append("| motivo: ");
+            warning.append(war.aviso);
+            ui->setText->append(warning.c_str());
+            ui->setText->append("----------------------------------------------------");
+        }
+
     }catch(LexicalError const msg){
         string erro = "Erro no Lexico : ";
         erro.append(msg.getMessage());
@@ -128,11 +142,40 @@ void MainWindow::on_save_clicked()
 void MainWindow::on_btnTabela_clicked()
 {
     string tabelaSimbolosMsg;
-
+        ui->tabelaSimbolo->setText("");
     if(!sem) {
         ui->tabelaSimbolo->setText("A compilação não foi realizada");
         return;
     }else{
+        ui->tabelaSimbolo->append("----------------------Tokens das Funcoes----------------------------");
+        for(Simbolo sim : this->sem->tabelaSimboloFuncoes){
+            cout<<sim.tipo<<" "<<sim.id<<" escopo:"<<sim.escopo<<" init:"<<sim.inicializado<<" usada:"<<sim.usado<<" funcao:"<<sim.funcao<<" vetor:"<<sim.vetor<<" posVetor:"<<sim.posVetor<<" paremtro:"<<sim.parametro<<endl;
+            tabelaSimbolosMsg.append(sim.tipo);
+            tabelaSimbolosMsg.append(" ");
+            tabelaSimbolosMsg.append(sim.id);
+            tabelaSimbolosMsg.append("| escopo: ");
+            tabelaSimbolosMsg.append(to_string(sim.escopo));
+            tabelaSimbolosMsg.append("| inciada: ");
+            tabelaSimbolosMsg.append(to_string(sim.inicializado));
+            tabelaSimbolosMsg.append("| usada: ");
+            tabelaSimbolosMsg.append(to_string(sim.usado));
+            tabelaSimbolosMsg.append("| funcao: ");
+            tabelaSimbolosMsg.append(to_string(sim.funcao));
+            tabelaSimbolosMsg.append("| parametro: ");
+            tabelaSimbolosMsg.append(to_string(sim.parametro));
+            tabelaSimbolosMsg.append("| vetor: ");
+            tabelaSimbolosMsg.append(to_string(sim.vetor));
+            tabelaSimbolosMsg.append("| posVetor: ");
+            tabelaSimbolosMsg.append(to_string(sim.posVetor));
+
+            ui->tabelaSimbolo->append(tabelaSimbolosMsg.c_str());
+            ui->tabelaSimbolo->append("-----------------------------------------------------------------");
+
+            tabelaSimbolosMsg.clear();
+        }
+        ui->tabelaSimbolo->append("----------------------Tokens da Main----------------------------");
+
+
         for(Simbolo sim : this->sem->tabelaSimbolo){
             cout<<sim.tipo<<" "<<sim.id<<" escopo:"<<sim.escopo<<" init:"<<sim.inicializado<<" usada:"<<sim.usado<<" funcao:"<<sim.funcao<<" vetor:"<<sim.vetor<<" posVetor:"<<sim.posVetor<<" paremtro:"<<sim.parametro<<endl;
             tabelaSimbolosMsg.append(sim.tipo);

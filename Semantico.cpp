@@ -17,6 +17,7 @@ SemanticTable TabelaSemantica;
 Simbolo simboloVar; // usada pra auxiliar em inserções na tabela
 Simbolo varInit; // usada pra iniciar variavel
 Simbolo auxDeleteTable;// auxiliar para deletar simbolos repetidos da tabela
+Warning warning;
 //MAIN
 //list<Simbolo> tabelaSimbolo;
 //list<Simbolo> tabelaSimboloFuncoes;
@@ -139,10 +140,17 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
 
         case 5:
                 //tabelaSimbolo.remove(simboloVar);
-                if(compativel == 0 || compativel == 1 && compativelAtr == 0 || compativelAtr == 1 ){
+                if(compativel == 0 || compativelAtr == 0 ){
                 varInit.inicializado = true;
                 tabelaSimbolo.push_front(varInit);
                 break;
+                }else if(compativel == 1 || compativelAtr == 1 ){
+                varInit.inicializado = true;
+                tabelaSimbolo.push_front(varInit);
+                warning.id = varInit.id;
+                warning.escopo = varInit.escopo;
+                warning.aviso = "Perda de precisao";
+                listaWar.push_front(warning);
                 }else{
                   throw SemanticError("Tipo incompativel ", token->getPosition());
                 }
@@ -174,6 +182,7 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                 tabelaSimbolo.pop_front();
                 varInit.inicializado = true;
                 tabelaSimbolo.push_front(varInit);
+
                 break;
         case 12:
                 if(TabelaSemantica.resultType(tipoAtr, tipoUsado,tipoOperador) == -1){

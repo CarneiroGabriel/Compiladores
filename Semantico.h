@@ -5,11 +5,14 @@
 #include "SemanticError.h"
 #include <list>
 
+using namespace std;
+
 
 
 class Simbolo{
-public:  std::string tipo;
-    std::string id;
+public:
+    string tipo;
+    string id;
     bool inicializado = false;
     bool usado = false;
     bool parametro = false;
@@ -25,6 +28,13 @@ public:  std::string tipo;
 
 };
 
+class Warning{
+public:
+    int escopo;
+    string id;
+    string aviso;
+};
+
 
 class Semantico
 {
@@ -32,8 +42,9 @@ public:
     void executeAction(int action, const Token *token) throw (SemanticError );
 
 
-    std::list<Simbolo> tabelaSimbolo;
-    std::list<Simbolo> tabelaSimboloFuncoes;
+    list<Warning> listaWar;
+    list<Simbolo> tabelaSimbolo;
+    list<Simbolo> tabelaSimboloFuncoes;
 
 };
 
