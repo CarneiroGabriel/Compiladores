@@ -10,10 +10,14 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
+class Semantico;
+
 class MainWindow : public QMainWindow
 
 {
     Q_OBJECT
+
+    Semantico * sem;
 
 public:
     MainWindow(QWidget *parent = nullptr);

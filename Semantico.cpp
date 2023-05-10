@@ -9,35 +9,19 @@
 
 using namespace std;
 
-class Simbolo{
-public:  string tipo;
-         string id;
-         bool inicializado = false;
-         bool usado = false;
-         bool parametro = false;
-         bool funcao = false;
-         bool vetor = false;
-         int posVetor = false;
-         int escopo;
-
-    bool DescobrirTipo{
-       // if(tipo == "string"){
-
-        //}
-
-    };
-    void DeclararTipo(string t){
-        tipo = t;
-    };
-
+void Simbolo::DeclararTipo(std::string t){
+    tipo = t;
 };
+
 SemanticTable TabelaSemantica;
 Simbolo simboloVar; // usada pra auxiliar em inserções na tabela
 Simbolo varInit; // usada pra iniciar variavel
 Simbolo auxDeleteTable;// auxiliar para deletar simbolos repetidos da tabela
-list<Simbolo> tabelaSimbolo;
+//MAIN
+//list<Simbolo> tabelaSimbolo;
+//list<Simbolo> tabelaSimboloFuncoes;
+//--------
 list<Simbolo> tabelaSimboloAuxDelete;// auxiliar para deletar simbolos repetidos da tabela
-list<Simbolo> tabelaSimboloFuncoes;
 stack<list<Simbolo>> escopo;
 int posVetor;
 int contadorEscopo =0;
@@ -68,7 +52,6 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
 {
    // cout << "Ação: " << action << ", Token: "  << token->getId()
      //    << ", Lexema: " << token->getLexeme() << endl;
-
 
     contadorEscopo = escopo.empty() ? escopo.size(): 0;
     simboloVar.escopo = contadorEscopo;
@@ -412,17 +395,17 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
             tabelaSimbolosEscopo.push(tabelaSimbolo);
 
             contadorEscopo = 0;
-            for(Simbolo sim : tabelaSimbolo){
+            /*for(Simbolo sim : tabelaSimbolo){
                      cout<<sim.tipo<<" "<<sim.id<<" escopo:"<<sim.escopo<<" init:"<<sim.inicializado<<" usada:"<<sim.usado<<" funcao:"<<sim.funcao<<" vetor:"<<sim.vetor<<" posVetor:"<<sim.posVetor<<" paremtro:"<<sim.parametro<<endl;
             }
             tabelaSimbolo.clear();
 
             cout << tabelaSimboloFuncoes.size();
-
+            /*
             for(Simbolo sim : tabelaSimboloFuncoes){
                      cout<< "-------------------------------------------------------------------------";
                 cout<<sim.tipo<<" "<<sim.id<<" escopo:"<<sim.escopo<<" init:"<<sim.inicializado<<" usada:"<<sim.usado<<" funcao:"<<sim.funcao<<" vetor:"<<sim.vetor<<" posVetor:"<<sim.posVetor<<" paremtro:"<<sim.parametro<<endl;
-            }
+            }*/
             tabelaSimbolosEscopo = escopo;
             while (!escopo.empty()) {
                 escopo.pop();
