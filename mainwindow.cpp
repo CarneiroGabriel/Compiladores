@@ -64,6 +64,7 @@ void MainWindow::on_pushButton_clicked()
             warning.append(war.aviso);
             ui->setText->append(warning.c_str());
             ui->setText->append("----------------------------------------------------");
+            warning.clear();
         }
 
     }catch(LexicalError const msg){
