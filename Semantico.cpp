@@ -18,21 +18,19 @@ Simbolo simboloVar; // usada pra auxiliar em inserções na tabela
 Simbolo varInit; // usada pra iniciar variavel
 Simbolo auxDeleteTable;// auxiliar para deletar simbolos repetidos da tabela
 Warning warning;
-//MAIN
-//list<Simbolo> tabelaSimbolo;
-//list<Simbolo> tabelaSimboloFuncoes;
-//--------
 list<Simbolo> tabelaSimboloAuxDelete;// auxiliar para deletar simbolos repetidos da tabela
 stack<list<Simbolo>> escopo;
+stack<int> operadoresUsados;
+stack<int> atributosUsados;
 int posVetor;
-int contadorEscopo =0;
 int tipoUsado;
+int tipo0;
+int tipo1;
 int tipoAtr;
 int tipoOperador;
 int compativel;
 int compativelAtr = 0;
 bool VarExiste;
-stack<list<Simbolo>> tabelaSimbolosEscopo;
 
 int ConverteTipo(string tipo){
     if(tipo == "int"){
@@ -54,8 +52,7 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
    // cout << "Ação: " << action << ", Token: "  << token->getId()
      //    << ", Lexema: " << token->getLexeme() << endl;
 
-    contadorEscopo = escopo.empty() ? escopo.size(): 0;
-    simboloVar.escopo = contadorEscopo;
+    simboloVar.escopo = escopo.empty() ? escopo.size(): 0;
     string lexema = token->getLexeme();
 
     switch(action){
@@ -64,7 +61,6 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
             break;
 
         case 2:
-            //cout<<"\n escopo variavel:" <<contadorEscopo<<endl;
             for (const Simbolo &simboloFor : tabelaSimbolo){
                 if(lexema == simboloFor.id && escopo.size() == simboloFor.escopo){
                     //disparar erro semantico
@@ -96,6 +92,7 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                 if(lexema == simboloFor.id && simboloFor.usado && escopo.size() >= simboloFor.escopo){
                     cout<< "variavelfoi usada";
                     tipoUsado = ConverteTipo(simboloFor.tipo);
+                    atributosUsados.push(tipoUsado);
                     VarExiste = true;
                     if(!simboloFor.inicializado){
                         warning.id = simboloFor.id;
@@ -119,9 +116,6 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                             listaWar.push_front(warning);
                         }
                     }
-
-                    //simboloFor.escopo = contadorEscopo;
-                    //tabelaSimbolo.push_front(simboloFor);
                 }
                 tabelaSimbolo.pop_front();
             }
@@ -179,22 +173,27 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
 
         case 6:
                 tipoUsado = 2;
+                atributosUsados.push(tipoUsado);
                 //char
                 break;
         case 7:
                 tipoUsado = 3;
+                atributosUsados.push(tipoUsado);
                 //string
                 break;
         case 8:
                 tipoUsado = 0;
+                atributosUsados.push(tipoUsado);
                 //int
                 break;
         case 9:
                 tipoUsado = 1;
+                atributosUsados.push(tipoUsado);
                 //float
                 break;
         case 11:
                 tipoUsado = 4;
+                atributosUsados.push(tipoUsado);
                 //bool
                 break;
         case 10:
@@ -203,7 +202,8 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                 tipoAtr = ConverteTipo(varInit.tipo);
                 tabelaSimbolo.pop_front();
 
-                if(tipoOperador != NULL){
+                if(!operadoresUsados.empty()){
+
                   compativelAtr = TabelaSemantica.resultType(tipoAtr, tipoUsado,tipoOperador);
                   tipoUsado = compativelAtr;
                   tipoOperador = NULL;
@@ -234,10 +234,20 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                 break;
 
         case 12:
-                if(tipoOperador != NULL){
-                  compativelAtr = TabelaSemantica.resultType(tipoAtr, tipoUsado,tipoOperador);
+                if(!operadoresUsados.empty()){
+                  while (!operadoresUsados.empty()) {
+                    tipo0 = atributosUsados.top();
+                    atributosUsados.pop();
+                    tipo1 = atributosUsados.top();
+                    atributosUsados.pop();
+                    tipoOperador = operadoresUsados.top();
+                    operadoresUsados.pop();
+
+                    compativelAtr = TabelaSemantica.resultType(tipo0, tipo1,tipoOperador);
+                    atributosUsados.push(compativelAtr);
+                  }
+
                   tipoUsado = compativelAtr;
-                  tipoOperador = NULL;
                 }
                 if( TabelaSemantica.atribType(tipoAtr, tipoUsado) == -1){
                   compativel = -1;
@@ -252,27 +262,32 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
 
         case 13:
                 tipoOperador = 0;
+                operadoresUsados.push(tipoOperador);
                 break;
         case 14:
                 tipoOperador = 1;
+                operadoresUsados.push(tipoOperador);
                 break;
         case 15:
                 tipoOperador = 2;
+                operadoresUsados.push(tipoOperador);
                 break;
         case 16:
                 tipoOperador = 3;
+                operadoresUsados.push(tipoOperador);
                 break;
         case 17:
                 tipoOperador = 4;
+                operadoresUsados.push(tipoOperador);
                 break;
         case 22:
                 tipoOperador = 5;
+                operadoresUsados.push(tipoOperador);
                 break;
 
         case 18:
             cout<<"\n escopo:" <<simboloVar.escopo<<endl;
             escopo.push(tabelaSimbolo);
-            tabelaSimbolosEscopo.push(tabelaSimbolo);
             break;
         case 19:
             escopo.pop();
@@ -397,9 +412,6 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                         tabelaSimboloAuxDelete.push_front(simboloFor);
                         tipoUsado = ConverteTipo(simboloVar.tipo);
                     }
-
-                    //simboloFor.escopo = contadorEscopo;
-                    //tabelaSimbolo.push_front(simboloFor);
                      }
                      tabelaSimbolo.pop_front();
             }
@@ -446,21 +458,6 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
 
 
         case 29:
-            tabelaSimbolosEscopo.push(tabelaSimbolo);
-
-            contadorEscopo = 0;
-            /*for(Simbolo sim : tabelaSimbolo){
-                     cout<<sim.tipo<<" "<<sim.id<<" escopo:"<<sim.escopo<<" init:"<<sim.inicializado<<" usada:"<<sim.usado<<" funcao:"<<sim.funcao<<" vetor:"<<sim.vetor<<" posVetor:"<<sim.posVetor<<" paremtro:"<<sim.parametro<<endl;
-            }
-            tabelaSimbolo.clear();
-
-            cout << tabelaSimboloFuncoes.size();
-            /*
-            for(Simbolo sim : tabelaSimboloFuncoes){
-                     cout<< "-------------------------------------------------------------------------";
-                cout<<sim.tipo<<" "<<sim.id<<" escopo:"<<sim.escopo<<" init:"<<sim.inicializado<<" usada:"<<sim.usado<<" funcao:"<<sim.funcao<<" vetor:"<<sim.vetor<<" posVetor:"<<sim.posVetor<<" paremtro:"<<sim.parametro<<endl;
-            }*/
-            tabelaSimbolosEscopo = escopo;
             while (!escopo.empty()) {
                 escopo.pop();
             }
