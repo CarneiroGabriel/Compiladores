@@ -234,6 +234,7 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                 break;
 
         case 12:
+
                 if(!operadoresUsados.empty()){
                   while (!operadoresUsados.empty()) {
                     tipo0 = atributosUsados.top();
@@ -430,7 +431,7 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                     //talvez precisa de um continue para o for
                     simboloVar.parametro = true;
                     simboloVar.id = lexema;
-                    simboloVar.escopo = escopo.size();
+                    simboloVar.escopo = escopo.size() + 1;
                     tabelaSimbolo.push_front(simboloVar);
                     simboloVar.parametro = false;
                     break;
@@ -439,7 +440,7 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
             if(tabelaSimbolo.empty()){
                      simboloVar.parametro = true;
                      simboloVar.id = lexema;
-                     simboloVar.escopo = escopo.size();
+                     simboloVar.escopo = escopo.size() + 1;
                      tabelaSimbolo.push_front(simboloVar);
                      simboloVar.parametro = false;
                      break;
@@ -462,6 +463,21 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                 escopo.pop();
             }
 
+            break;
+
+        case 30:
+
+            auxDeleteTable = tabelaSimbolo.front();
+            tabelaSimbolo.pop_front();
+            auxDeleteTable.escopo++;
+            tabelaSimbolo.push_front(auxDeleteTable);
+
+            break;
+
+        case 31:
+            if(tipoAtr == 1 || tipoAtr == 0){
+                compativel = 0;
+            }
             break;
 
     }
