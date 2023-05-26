@@ -15,7 +15,7 @@ void Simbolo::DeclararTipo(std::string t){
 
 SemanticTable TabelaSemantica;
 Simbolo simboloVar; // usada pra auxiliar em inserções na tabela
-Simbolo varInit; // usada pra iniciar variavel
+Simbolo *varInit; // usada pra iniciar variavel
 Simbolo auxDeleteTable;// auxiliar para deletar simbolos repetidos da tabela
 Warning warning;
 list<Simbolo> tabelaSimboloAuxDelete;// auxiliar para deletar simbolos repetidos da tabela
@@ -31,6 +31,7 @@ int tipoOperador;
 int compativel;
 int compativelAtr = 0;
 bool VarExiste;
+bool varUsadaPropria;
 
 int ConverteTipo(string tipo){
     if(tipo == "int"){
@@ -49,8 +50,8 @@ int ConverteTipo(string tipo){
 
 void Semantico::executeAction(int action, const Token *token) throw (SemanticError)
 {
-   // cout << "Ação: " << action << ", Token: "  << token->getId()
-     //    << ", Lexema: " << token->getLexeme() << endl;
+    cout << "Ação: " << action << ", Token: "  << token->getId()
+         << ", Lexema: " << token->getLexeme() << endl;
 
     simboloVar.escopo = escopo.empty() ? escopo.size(): 0;
     string lexema = token->getLexeme();
@@ -86,6 +87,7 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
             break;
 
         case 3:
+            cout<<"Lexema caso 3 : "<<lexema;
             for (Simbolo simboloFor : tabelaSimbolo){
                 auxDeleteTable = tabelaSimbolo.front();
                 tabelaSimboloAuxDelete.push_front(auxDeleteTable);
@@ -119,6 +121,16 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                 }
                 tabelaSimbolo.pop_front();
             }
+            if(varInit != nullptr){
+                tipoUsado = ConverteTipo(varInit->tipo);
+                atributosUsados.push(tipoUsado);
+                varInit->usado = true;
+                VarExiste = true;
+                varUsadaPropria = false;
+
+            }
+
+
             tabelaSimbolo.swap(tabelaSimboloAuxDelete);
             tabelaSimboloAuxDelete.clear();
             if(VarExiste){
@@ -134,11 +146,12 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                 tabelaSimboloAuxDelete.push_front(auxDeleteTable);
                 if(lexema == simboloFor.id && escopo.size() >= simboloFor.escopo){
                     if(auxDeleteTable.id == simboloFor.id  && auxDeleteTable.tipo == simboloFor.tipo  && auxDeleteTable.escopo <= simboloFor.escopo){
-                        varInit = simboloFor;
-                        cout<<"to ak "<< varInit.id<<endl;
-                        tipoAtr = ConverteTipo(varInit.tipo);
+                        varInit = &simboloFor;
+                        cout<<"to ak "<< varInit->id<<endl;
+                        tipoAtr = ConverteTipo(varInit->tipo);
                         VarExiste = true;
                         tabelaSimboloAuxDelete.pop_front();
+                        varUsadaPropria = true;
                     }
 
                 }
@@ -156,14 +169,14 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
         case 5:
                 //tabelaSimbolo.remove(simboloVar);
                 if(compativel == 0){
-                    varInit.inicializado = true;
-                    tabelaSimbolo.push_front(varInit);
+                varInit->inicializado = true;
+                    tabelaSimbolo.push_front(*varInit);
                     break;
                 }else if(compativel == 1){
-                    varInit.inicializado = true;
-                    tabelaSimbolo.push_front(varInit);
-                    warning.id = varInit.id;
-                    warning.escopo = varInit.escopo;
+                    varInit->inicializado = true;
+                    tabelaSimbolo.push_front(*varInit);
+                    warning.id = varInit->id;
+                    warning.escopo = varInit->escopo;
                     warning.aviso = "Perda de precisao";
                     listaWar.push_front(warning);
                 }else{
@@ -198,8 +211,8 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                 break;
         case 10:
                 //tabelaSimbolo.remove(simboloVar);
-                varInit =  tabelaSimbolo.front();
-                tipoAtr = ConverteTipo(varInit.tipo);
+                varInit =  &tabelaSimbolo.front();
+                tipoAtr = ConverteTipo(varInit->tipo);
                 tabelaSimbolo.pop_front();
 
                 if(!operadoresUsados.empty()){
@@ -218,14 +231,14 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                 };
 
                 if(compativel == 0 ){
-                  varInit.inicializado = true;
-                  tabelaSimbolo.push_front(varInit);
+                  varInit->inicializado = true;
+                  tabelaSimbolo.push_front(*varInit);
                   break;
                 }else if(compativel == 1){
-                  varInit.inicializado = true;
-                  tabelaSimbolo.push_front(varInit);
-                  warning.id = varInit.id;
-                  warning.escopo = varInit.escopo;
+                  varInit->inicializado = true;
+                  tabelaSimbolo.push_front(*varInit);
+                  warning.id = varInit->id;
+                  warning.escopo = varInit->escopo;
                   warning.aviso = "Perda de precisao";
                   listaWar.push_front(warning);
                 }else{
@@ -379,7 +392,7 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                      tabelaSimboloAuxDelete.push_front(auxDeleteTable);
                      if(lexema == simboloFor.id && escopo.size() >= simboloFor.escopo && simboloFor.vetor && simboloFor.posVetor >= posVetor){
                     if(auxDeleteTable.id == simboloFor.id  && auxDeleteTable.tipo == simboloFor.tipo  && auxDeleteTable.escopo <= simboloFor.escopo){
-                        varInit = simboloFor;
+                        varInit = &simboloFor;
                         tipoAtr = ConverteTipo(simboloVar.tipo);
                         VarExiste = true;
                         if(simboloFor.posVetor == posVetor){
