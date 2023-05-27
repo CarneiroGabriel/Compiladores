@@ -19,12 +19,15 @@ Simbolo varInit; // usada pra iniciar variavel
 Simbolo auxDeleteTable;// auxiliar para deletar simbolos repetidos da tabela
 Warning warning;
 list<Simbolo> tabelaSimboloAuxDelete;// auxiliar para deletar simbolos repetidos da tabela
+stack< string> valorAtr;
 stack<list<Simbolo>> escopo;
 stack<int> operadoresUsados;
 stack<int> atributosUsados;
-string data;
-string text;
+string auxTextVetor;
+string auxTextVar;
+int contador;
 int posVetor;
+int tamVetor;
 int tipoUsado;
 int tipo0;
 int tipo1;
@@ -98,6 +101,7 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                     cout<< "variavelfoi usada";
                     tipoUsado = ConverteTipo(simboloFor.tipo);
                     atributosUsados.push(tipoUsado);
+                    valorAtr.push(lexema);
                     VarExiste = true;
                     if(!simboloFor.inicializado){
                         warning.id = simboloFor.id;
@@ -172,6 +176,15 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
 
         case 5:
                 //tabelaSimbolo.remove(simboloVar);
+                if(!auxTextVetor.empty()){
+                text.append("\n STOV ");
+                text.append(auxTextVetor);
+                auxTextVetor.clear();
+                }else{
+                text.append("\n STO ");
+                text.append(varInit.id);
+                }
+
                 if(compativel == 0){
                 varInit.inicializado = true;
                     tabelaSimbolo.push_front(varInit);
@@ -183,9 +196,11 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                     warning.escopo = varInit.escopo;
                     warning.aviso = "Perda de precisao";
                     listaWar.push_front(warning);
+
                 }else{
                   throw SemanticError("Tipo incompativel ", token->getPosition());
                 }
+
                 break;
 
         case 6:
@@ -202,7 +217,7 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                 tipoUsado = 0;
                 atributosUsados.push(tipoUsado);
                 //int
-                valorInteiro = stoi(lexema);
+                valorAtr.push(lexema);
 
                 break;
         case 9:
@@ -269,6 +284,22 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
 
                   tipoUsado = compativelAtr;
                 }
+
+                if(tipoUsado == 0 && valorAtr.size() == 1){
+                  if(valorAtr.top().find('0',0) || valorAtr.top().find('1',0) ||valorAtr.top().find('2',0) ||valorAtr.top().find('3',0) ||valorAtr.top().find('4',0) ||valorAtr.top().find('5',0) ||valorAtr.top().find('6',0) ||valorAtr.top().find('7',0) ||valorAtr.top().find('8',0) ||valorAtr.top().find('9',0) ){
+                    text.append("\n LDI ");
+                    text.append(valorAtr.top());
+                    valorAtr.pop();
+                  }else{
+                  text.append("\n LD ");
+                  text.append(valorAtr.top());
+                  valorAtr.pop();
+
+                  }
+
+                };
+
+
                 if( TabelaSemantica.atribType(tipoAtr, tipoUsado) == -1){
                   compativel = -1;
                 }else if(TabelaSemantica.atribType(tipoAtr, tipoUsado) == 1){
@@ -360,7 +391,7 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
 
             simboloVar = tabelaSimbolo.front();
             simboloVar.vetor = true;
-            simboloVar.posVetor = posVetor;
+            simboloVar.posVetor = tamVetor;
             tabelaSimbolo.pop_front();
             tabelaSimbolo.push_front(simboloVar);
             simboloVar.vetor = false;
@@ -396,12 +427,12 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
             for (Simbolo simboloFor : tabelaSimbolo){
                      auxDeleteTable = tabelaSimbolo.front();
                      tabelaSimboloAuxDelete.push_front(auxDeleteTable);
-                     if(lexema == simboloFor.id && escopo.size() >= simboloFor.escopo && simboloFor.vetor && simboloFor.posVetor >= posVetor){
+                     if(lexema == simboloFor.id && escopo.size() >= simboloFor.escopo && simboloFor.vetor && simboloFor.posVetor >= tamVetor){
                     if(auxDeleteTable.id == simboloFor.id  && auxDeleteTable.tipo == simboloFor.tipo  && auxDeleteTable.escopo <= simboloFor.escopo){
                         varInit = simboloFor;
                         tipoAtr = ConverteTipo(simboloVar.tipo);
                         VarExiste = true;
-                        if(simboloFor.posVetor == posVetor){
+                        if(simboloFor.posVetor == tamVetor){
                         tabelaSimboloAuxDelete.pop_front();
                         }
                     }
@@ -411,6 +442,7 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
             tabelaSimbolo.swap(tabelaSimboloAuxDelete);
             tabelaSimboloAuxDelete.clear();
             if(VarExiste){
+                     auxTextVetor = lexema;
                      VarExiste = false;
                      break;
             }
@@ -426,7 +458,7 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                     cout<< "variavelfoi usada";
                     tipoUsado = ConverteTipo(simboloVar.tipo);
                      }else if(lexema == simboloFor.id && escopo.size() >= simboloFor.escopo){
-                    if(auxDeleteTable.id == simboloFor.id  && auxDeleteTable.tipo == simboloFor.tipo  && auxDeleteTable.escopo <= simboloFor.escopo && simboloFor.posVetor >= posVetor){
+                    if(auxDeleteTable.id == simboloFor.id  && auxDeleteTable.tipo == simboloFor.tipo  && auxDeleteTable.escopo <= simboloFor.escopo && simboloFor.posVetor >= tamVetor){
                         simboloFor.usado = true;
                         tabelaSimboloAuxDelete.pop_front();
                         tabelaSimboloAuxDelete.push_front(simboloFor);
@@ -467,12 +499,15 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
             break;
 
         case 27:
-            posVetor = stoi(lexema);
+            tamVetor = stoi(lexema);
+            //definir tamanho do vetor
             //cout << posVetor;
             break;
 
         case 28:
             posVetor = stoi(lexema);
+            text.append("\n STO $indr");
+            //acessar o indice do vetor
             //cout << posVetor;
             break;
 
@@ -482,15 +517,36 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                 escopo.pop();
             }
 
-            tabelaSimbolo.rend();
+
+            /*for(Simbolo simboloFor : tabelaSimbolo){
+                if(varInit.id != simboloFor.id && varInit.escopo != simboloFor.escopo){
+                    contador++;
+                }else{
+                    break;
+                }
+            }
+            if(contador == tabelaSimbolo.size()){
+                tabelaSimbolo.push_front(varInit);
+            }*/
+
             for (auto it = tabelaSimbolo.rbegin(); it != tabelaSimbolo.rend(); ++it){
                 data.append(it->id);
-                data.append(" : 0 \n");
+                if(it->posVetor != 0){
+                    data.append(" : 0");
+                    for(int i = 1; i<= it->posVetor;i++){
+                        data.append(",0");
+                    }
+                    data.append("\n");
+                }else{
+                    data.append(" : 0 \n");
+                }
+
             }
 
+            cout<<".DATA \n";
             cout<<data;
-
-            data.clear();
+            cout<<".TEXT \n";
+            cout<<text;
 
             break;
 
@@ -511,7 +567,14 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
 
         case 32:
             //cin
-            text.append("LD $in_port \n STO");
+            if(lexema == "]"){
+                text.append("\n LD $in_port \n STOV ");
+                text.append(auxTextVetor);
+                tabelaSimbolo.push_front(varInit);
+                auxTextVetor.clear();
+                break;
+            }
+            text.append("\n LD $in_port \n STO");
             text.append(lexema);
             break;
         case 33:
@@ -519,14 +582,25 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
             //cout
             break;
         case 34:
-            text.append("LD ");
+            if(lexema == "]"){
+                text.append("\n LDV ");
+                text.append(auxTextVetor);
+                tabelaSimbolo.push_front(varInit);
+                auxTextVetor.clear();
+                break;
+            }
+            text.append("\n LD ");
             text.append(lexema);
             //cout id
             break;
         case 35:
-            text.append("LDI ");
+            text.append("\n LDI ");
             text.append(lexema);
             //cout numero
+            break;
+
+        case 36:
+
             break;
     }
 

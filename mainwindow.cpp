@@ -210,3 +210,23 @@ void MainWindow::on_btnTabela_clicked()
     }
 }
 
+
+void MainWindow::on_BipsMipsBtn_clicked()
+{
+    ui->BipMips->setText("");
+
+    if(!sem) {
+        ui->BipMips->setText("A compilação não foi realizada");
+        return;
+    }else{
+         ui->BipMips->append(".DATA");
+         ui->BipMips->append(this->sem->data.c_str());
+         ui->BipMips->append(".TEXT");
+         ui->BipMips->append(this->sem->text.c_str());
+
+         this->sem->data.clear();
+         this->sem->text.clear();
+
+    }
+}
+

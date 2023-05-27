@@ -46,6 +46,8 @@ public:
     list<Warning> listaWar;
     list<Simbolo> tabelaSimbolo;
     list<Simbolo> tabelaSimboloFuncoes;
+    string data;
+    string text;
 
 };
 
