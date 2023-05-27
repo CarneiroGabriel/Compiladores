@@ -19,6 +19,7 @@ public:
     bool funcao = false;
     bool vetor = false;
     int posVetor = false;
+    int valor = 0;
     int escopo;
 
     void DeclararTipo(std::string t);
