@@ -20,15 +20,19 @@ Simbolo auxDeleteTable;// auxiliar para deletar simbolos repetidos da tabela
 Warning warning;
 list<Simbolo> tabelaSimboloAuxDelete;// auxiliar para deletar simbolos repetidos da tabela
 stack< string> valorAtr;
+stack< string> valorAtrRev;
 stack<list<Simbolo>> escopo;
 stack<int> operadoresUsados;
 stack<int> atributosUsados;
+stack<int> auxOperadoresUsados;
 string auxTextVetor;
 string auxTextVar;
 int contador;
 int posVetor;
 int tamVetor;
 int tipoUsado;
+int tipoBip0;
+int tipoBip1;
 int tipo0;
 int tipo1;
 int tipoAtr;
@@ -37,7 +41,11 @@ int compativel;
 int compativelAtr = 0;
 bool VarExiste;
 bool varUsadaPropria;
-int valorInteiro;
+int valorInteiro0;
+int valorInteiro1;
+string valorVar0;
+string valorVar1;
+
 
 int ConverteTipo(string tipo){
     if(tipo == "int"){
@@ -176,6 +184,65 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
 
         case 5:
                 //tabelaSimbolo.remove(simboloVar);
+
+
+                if(tipoUsado == 0 && valorAtr.size() == 1){
+                if(valorAtr.top().find('0',0) || valorAtr.top().find('1',0) ||valorAtr.top().find('2',0) ||valorAtr.top().find('3',0) ||valorAtr.top().find('4',0) ||valorAtr.top().find('5',0) ||valorAtr.top().find('6',0) ||valorAtr.top().find('7',0) ||valorAtr.top().find('8',0) ||valorAtr.top().find('9',0) ){
+                    text.append("\n LDI ");
+                    text.append(valorAtr.top());
+                    valorAtr.pop();
+                }else{
+                    text.append("\n LD ");
+                    text.append(valorAtr.top());
+                    valorAtr.pop();
+                }
+                cout<<"\n caso 12 size 1";
+                };
+
+                while(!valorAtr.empty()){
+                valorAtrRev.push(valorAtr.top());
+                valorAtr.pop();
+                }
+
+                if(!valorAtrRev.empty()){
+                if(valorAtrRev.size() == 2){
+                    cout<<"\n caso 12 size 1";
+                    if(valorAtrRev.top().find('0',0) || valorAtrRev.top().find('1',0) ||valorAtrRev.top().find('2',0) ||valorAtrRev.top().find('3',0) ||valorAtrRev.top().find('4',0) ||valorAtrRev.top().find('5',0) ||valorAtrRev.top().find('6',0) ||valorAtrRev.top().find('7',0) ||valorAtrRev.top().find('8',0) ||valorAtrRev.top().find('9',0) ){
+                        text.append("\n LDI ");
+                        text.append(valorAtrRev.top());
+                        valorAtrRev.pop();
+                    }else{
+                        text.append("\n LD ");
+                        text.append(valorAtrRev.top());
+                        valorAtrRev.pop();
+                    }
+                    if(auxOperadoresUsados.top() == 1){
+                        if(valorAtrRev.top().find('0',0) || valorAtrRev.top().find('1',0) ||valorAtrRev.top().find('2',0) ||valorAtrRev.top().find('3',0) ||valorAtrRev.top().find('4',0) ||valorAtrRev.top().find('5',0) ||valorAtrRev.top().find('6',0) ||valorAtrRev.top().find('7',0) ||valorAtrRev.top().find('8',0) ||valorAtrRev.top().find('9',0) ){
+                            text.append("\n SUBI ");
+                            text.append(valorAtrRev.top());
+                            valorAtrRev.pop();
+                        }else{
+                            text.append("\n SUB ");
+                            text.append(valorAtrRev.top());
+                            valorAtrRev.pop();
+                        }
+                    }else if(auxOperadoresUsados.top() == 0){
+                        if(valorAtrRev.top().find('0',0) || valorAtrRev.top().find('1',0) ||valorAtrRev.top().find('2',0) ||valorAtrRev.top().find('3',0) ||valorAtrRev.top().find('4',0) ||valorAtrRev.top().find('5',0) ||valorAtrRev.top().find('6',0) ||valorAtrRev.top().find('7',0) ||valorAtrRev.top().find('8',0) ||valorAtrRev.top().find('9',0) ){
+                            text.append("\n ADDI ");
+                            text.append(valorAtrRev.top());
+                            valorAtrRev.pop();
+                        }else{
+                            text.append("\n ADD ");
+                            text.append(valorAtrRev.top());
+                            valorAtrRev.pop();
+                        }
+                    }
+                    auxOperadoresUsados.pop();
+                }
+
+                }
+
+
                 if(!auxTextVetor.empty()){
                 text.append("\n STOV ");
                 text.append(auxTextVetor);
@@ -235,6 +302,9 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                 varInit =  tabelaSimbolo.front();
                 tipoAtr = ConverteTipo(varInit.tipo);
                 tabelaSimbolo.pop_front();
+                varInit.valor = stoi(valorAtr.top());
+                valorAtr.pop();
+                atributosUsados.pop();
 
                 if(!operadoresUsados.empty()){
 
@@ -268,6 +338,8 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                 break;
 
         case 12:
+                auxOperadoresUsados.swap(operadoresUsados);
+
 
                 if(!operadoresUsados.empty()){
                   while (!operadoresUsados.empty()) {
@@ -277,28 +349,12 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                     atributosUsados.pop();
                     tipoOperador = operadoresUsados.top();
                     operadoresUsados.pop();
-
                     compativelAtr = TabelaSemantica.resultType(tipo0, tipo1,tipoOperador);
                     atributosUsados.push(compativelAtr);
                   }
 
                   tipoUsado = compativelAtr;
                 }
-
-                if(tipoUsado == 0 && valorAtr.size() == 1){
-                  if(valorAtr.top().find('0',0) || valorAtr.top().find('1',0) ||valorAtr.top().find('2',0) ||valorAtr.top().find('3',0) ||valorAtr.top().find('4',0) ||valorAtr.top().find('5',0) ||valorAtr.top().find('6',0) ||valorAtr.top().find('7',0) ||valorAtr.top().find('8',0) ||valorAtr.top().find('9',0) ){
-                    text.append("\n LDI ");
-                    text.append(valorAtr.top());
-                    valorAtr.pop();
-                  }else{
-                  text.append("\n LD ");
-                  text.append(valorAtr.top());
-                  valorAtr.pop();
-
-                  }
-
-                };
-
 
                 if( TabelaSemantica.atribType(tipoAtr, tipoUsado) == -1){
                   compativel = -1;
@@ -536,6 +592,10 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                     for(int i = 1; i<= it->posVetor;i++){
                         data.append(",0");
                     }
+                    data.append("\n");
+                }else if(it->valor != 0){
+                    data.append(": ");
+                    data.append(to_string(it->valor));
                     data.append("\n");
                 }else{
                     data.append(" : 0 \n");
