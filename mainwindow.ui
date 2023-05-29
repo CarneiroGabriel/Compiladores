@@ -23,6 +23,11 @@
       <height>371</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <pointsize>14</pointsize>
+     </font>
+    </property>
    </widget>
    <widget class="QPushButton" name="pushButton">
     <property name="geometry">
@@ -45,6 +50,11 @@
       <width>631</width>
       <height>161</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>14</pointsize>
+     </font>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -98,6 +108,11 @@
       <height>541</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <pointsize>14</pointsize>
+     </font>
+    </property>
     <property name="readOnly">
      <bool>true</bool>
     </property>
@@ -110,6 +125,11 @@
       <width>471</width>
       <height>471</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
     </property>
     <property name="readOnly">
      <bool>true</bool>

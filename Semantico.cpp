@@ -34,6 +34,7 @@ stack<int> auxOperadoresUsados;
 stack<string> auxTextVetor;
 string auxTextVar;
 stack<int> temporarioUsado;
+stack<int> auxTemporario;
 stack<int> temporarioDisponivel;
 int contador;
 int posVetor;
@@ -195,10 +196,10 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                 break;
 
         case 5:
-                //tabelaSimbolo.remove(simboloVar);
 
+                cout<<"\n 200 line \n";
 
-                if(tipoUsado == 0 && valorAtr.size() == 1){
+               /* if(tipoUsado == 0 && valorAtr.size() == 1){
                 if(isNumeric(valorAtr.top())){
                     text.append("\n LDI ");
                     text.append(valorAtr.top());
@@ -208,14 +209,16 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                     text.append(valorAtr.top());
                     valorAtr.pop();
                 }
-                };
+                };*/
 
 
                 while(!valorAtr.empty()){
                 valorAtrRev.push(valorAtr.top());
                 valorAtr.pop();
                 }
+
                     cout<<"\n 218 line \n";
+
                 if(!valorAtrRev.empty()){
 
                     if(isNumeric(valorAtrRev.top())){
@@ -251,10 +254,18 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                         }
                         auxOperadoresUsados.pop();
                     }
+                        /*if(!auxTextVetor.empty() && !temporarioDisponivel.empty()){
+                            text.append("\n STO ");
+                            text.append(to_string(temporarioDisponivel.top()));
+                            temporarioUsado.push(temporarioDisponivel.top());
+                            temporarioDisponivel.pop();
+                        }*/
+                     }
 
-                }
                     cout<<"\n 256 line \n";
-                if(temporarioUsado.size() == 3){
+
+
+                    if(temporarioUsado.size() >= 3){
                     auxTemp0 =temporarioUsado.top();
                     temporarioUsado.pop();
                     auxTemp1 =temporarioUsado.top();
@@ -264,24 +275,27 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
 
                 }
                 while(!temporarioUsado.empty()){
-                    temporarioDisponivel.push(temporarioUsado.top());
+                    auxTemporario.push(temporarioUsado.top());
                     temporarioUsado.pop();
                 }
-                while(!temporarioDisponivel.empty()){
-                    auxTextVetor.push(to_string(temporarioDisponivel.top()));
-                    temporarioDisponivel.pop();
+                while(!auxTemporario.empty()){
+                    auxTextVetor.push(to_string(auxTemporario.top()));
+                    auxTemporario.pop();
                 }
 
                 if(!auxTextVetor.empty()){
 
                     cout<<"\n 277 line \n";
-
-                    text.append("\n LD ");
+                        if(auxTextVetor.size() > 2){
+                   /* text.append("\n LD 277 ");
                     text.append(auxTextVetor.top());
                     if(isNumeric(auxTextVetor.top()) ){
                         temporarioDisponivel.push(stoi(auxTextVetor.top()));
-                    }
+                    }*/
                     auxTextVetor.pop();
+                        }
+
+
                     while (!auxTextVetor.empty()) {
                         if(auxTextVetor.size() > 2){
                         if(auxOperadoresUsados.top() == 1){
@@ -306,8 +320,11 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                         temporarioDisponivel.pop();
                         break;
                         }
+                        if(!auxOperadoresUsados.empty()){
                         auxOperadoresUsados.pop();
+                        }
                     }
+                    if(auxTextVetor.size() >= 2){
                     text.append("\n LD ");
                     text.append(auxTextVetor.top());
                     auxTextVetor.pop();
@@ -318,6 +335,7 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                     text.append("\n STOV ");
                     text.append(auxTextVetor.top());
                     auxTextVetor.pop();
+                    }
                 }else{
                 text.append("\n STO ");
                 text.append(varInit.id);
@@ -643,8 +661,8 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
         case 28:
             posVetor = stoi(lexema);
 
-            if(tipoUsado == 0 && valorAtr.size() == 1){
-                     if(isNumeric(valorAtrRev.top())){
+            if(operadoresUsados.empty()){
+                     if(isNumeric(valorAtr.top())){
                     text.append("\n LDI ");
                     text.append(valorAtr.top());
                      }else{
@@ -652,12 +670,13 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                     text.append(valorAtr.top());
                      }
                      valorAtr.pop();
-                     if(auxTextVetor.size() > 1){
+                     /*
+                      * if(auxTextVetor.size() == 1){
                     text.append("\n STO $INDR");
-                    text.append("\n LDV ");
+                    *text.append("\n LDV ");
                     text.append(auxTextVetor.top());
-                    auxTextVetor.pop();
-                     }
+                    auxTextVetor.pop();*
+                     }*/
                      temporarioUsado.push(temporarioDisponivel.top());
                      temporarioDisponivel.pop();
                      text.append("\n STO ");
@@ -677,8 +696,8 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                         text.append(valorAtrRev.top());
                         valorAtrRev.pop();
                     }else{
-                        text.append("\n LD ");
-                        text.append(valorAtrRev.top());
+                        /*text.append("\n LD ");
+                        text.append(valorAtrRev.top());*/
                         valorAtrRev.pop();
                     }
                     while(!valorAtrRev.empty()){
