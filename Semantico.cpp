@@ -634,7 +634,7 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
         case 28:
             posVetor = stoi(lexema);
 
-            if(operadoresUsados.empty()){
+            if(auxOperadoresUsados.empty()){
                      if(isNumeric(valorAtr.top())){
                     text.append("\n LDI ");
                     text.append(valorAtr.top());
@@ -663,14 +663,15 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
             }
 
             if(!valorAtrRev.empty()){
+                     valorAtrRev.pop();
 
                     if(isNumeric(valorAtrRev.top())){
                         text.append("\n LDI ");
                         text.append(valorAtrRev.top());
                         valorAtrRev.pop();
                     }else{
-                        /*text.append("\n LD ");
-                        text.append(valorAtrRev.top());*/
+                        text.append("\n LD ");
+                        text.append(valorAtrRev.top());
                         valorAtrRev.pop();
                     }
                     while(!valorAtrRev.empty()){
@@ -702,15 +703,14 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                         text.append(auxTextVetor.top());
                         auxTextVetor.pop();
                         }
-                        temporarioUsado.push(temporarioDisponivel.top());
-                        temporarioDisponivel.pop();
-                        text.append("\n STO ");
-                        text.append(to_string(temporarioUsado.top()));
+
 
                     }
                     }
-
-
+                    temporarioUsado.push(temporarioDisponivel.top());
+                    temporarioDisponivel.pop();
+                    text.append("\n STO ");
+                    text.append(to_string(temporarioUsado.top()));
             }
             //text.append("\n STO $indr");
             //acessar o indice do vetor
