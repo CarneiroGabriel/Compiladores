@@ -4,6 +4,7 @@
 #include "Token.h"
 #include "SemanticError.h"
 #include <list>
+#include <stack>
 
 using namespace std;
 
@@ -46,6 +47,7 @@ public:
     list<Warning> listaWar;
     list<Simbolo> tabelaSimbolo;
     list<Simbolo> tabelaSimboloFuncoes;
+    stack<int> temporarioDisponivel;
     string data;
     string text;
 

@@ -35,7 +35,6 @@ stack<string> auxTextVetor;
 string auxTextVar;
 stack<int> temporarioUsado;
 stack<int> auxTemporario;
-stack<int> temporarioDisponivel;
 int contador;
 int posVetor;
 int tamVetor;
@@ -74,12 +73,6 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
 
     simboloVar.escopo = escopo.empty() ? escopo.size(): 0;
     string lexema = token->getLexeme();
-
-    if(temporarioDisponivel.empty() && temporarioUsado.empty()){
-        temporarioDisponivel.push(1002);
-        temporarioDisponivel.push(1001);
-        temporarioDisponivel.push(1000);
-    }
 
     switch(action){
         case 1:
@@ -197,21 +190,6 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
 
         case 5:
 
-                cout<<"\n 200 line \n";
-
-               /* if(tipoUsado == 0 && valorAtr.size() == 1){
-                if(isNumeric(valorAtr.top())){
-                    text.append("\n LDI ");
-                    text.append(valorAtr.top());
-                    valorAtr.pop();
-                }else{
-                    text.append("\n LD ");
-                    text.append(valorAtr.top());
-                    valorAtr.pop();
-                }
-                };*/
-
-
                 while(!valorAtr.empty()){
                 valorAtrRev.push(valorAtr.top());
                 valorAtr.pop();
@@ -254,12 +232,7 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                         }
                         auxOperadoresUsados.pop();
                     }
-                        /*if(!auxTextVetor.empty() && !temporarioDisponivel.empty()){
-                            text.append("\n STO ");
-                            text.append(to_string(temporarioDisponivel.top()));
-                            temporarioUsado.push(temporarioDisponivel.top());
-                            temporarioDisponivel.pop();
-                        }*/
+
                      }
 
                     cout<<"\n 256 line \n";

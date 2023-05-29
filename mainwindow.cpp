@@ -47,6 +47,13 @@ void MainWindow::on_pushButton_clicked()
     }
     this->sem = new Semantico();
 
+    while(!this->sem->temporarioDisponivel.empty()){
+        this->sem->temporarioDisponivel.pop();
+    }
+
+    this->sem->temporarioDisponivel.push(1002);
+    this->sem->temporarioDisponivel.push(1001);
+    this->sem->temporarioDisponivel.push(1000);
 
 
     try {
