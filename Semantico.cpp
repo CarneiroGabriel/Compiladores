@@ -259,14 +259,7 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                 if(!auxTextVetor.empty()){
 
                     cout<<"\n 277 line \n";
-                        if(auxTextVetor.size() > 2){
-                   /* text.append("\n LD 277 ");
-                    text.append(auxTextVetor.top());
-                    if(isNumeric(auxTextVetor.top()) ){
-                        temporarioDisponivel.push(stoi(auxTextVetor.top()));
-                    }*/
-                    auxTextVetor.pop();
-                        }
+
 
 
                     while (!auxTextVetor.empty()) {
@@ -560,13 +553,7 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
             tabelaSimbolo.swap(tabelaSimboloAuxDelete);
             tabelaSimboloAuxDelete.clear();
 
-            if(varInit.id == lexema){
-                     tipoUsado = ConverteTipo(varInit.tipo);
-                     atributosUsados.push(tipoUsado);
-                     varInit.inicializado = true;
-                     valorAtr.push(lexema);
-                     VarExiste = true;
-            }
+
 
             if(VarExiste){
                      auxTextVetor.push( lexema);
@@ -663,7 +650,6 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
             }
 
             if(!valorAtrRev.empty()){
-                     valorAtrRev.pop();
 
                     if(isNumeric(valorAtrRev.top())){
                         text.append("\n LDI ");
@@ -739,7 +725,7 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                 data.append(it->id);
                 if(it->posVetor != 0){
                     data.append(" : 0");
-                    for(int i = 1; i<= it->posVetor;i++){
+                    for(int i = 1; i< it->posVetor;i++){
                         data.append(",0");
                     }
                     data.append("\n");
