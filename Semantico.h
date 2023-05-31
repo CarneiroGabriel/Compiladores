@@ -48,6 +48,7 @@ public:
     list<Simbolo> tabelaSimbolo;
     list<Simbolo> tabelaSimboloFuncoes;
     stack<int> temporarioDisponivel;
+    stack<int> temporarioUsado;
     string data;
     string text;
 

@@ -32,8 +32,7 @@ stack<int> operadoresUsados;
 stack<int> atributosUsados;
 stack<int> auxOperadoresUsados;
 stack<string> auxTextVetor;
-string auxTextVar;
-stack<int> temporarioUsado;
+stack<string> vetorOperando;
 stack<int> auxTemporario;
 int contador;
 int posVetor;
@@ -47,6 +46,9 @@ int tipoAtr;
 int tipoOperador;
 int compativel;
 int compativelAtr = 0;
+int diferencaValorAtrVetor;
+int auxOperacaoVetor1;
+int auxOperacaoVetor2;
 bool VarExiste;
 bool varUsadaPropria;
 
@@ -142,7 +144,7 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                 }
                 tabelaSimbolo.pop_front();
             }
-            if(varInit.id == lexema){
+            if(varInit.id == lexema && !varInit.vetor){
                 tipoUsado = ConverteTipo(varInit.tipo);
                 atributosUsados.push(tipoUsado);
                 varInit.usado = true;
@@ -166,7 +168,7 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
             for (Simbolo simboloFor : tabelaSimbolo){
                 auxDeleteTable = tabelaSimbolo.front();
                 tabelaSimboloAuxDelete.push_front(auxDeleteTable);
-                if(lexema == simboloFor.id && escopo.size() >= simboloFor.escopo){
+                if(lexema == simboloFor.id && escopo.size() >= simboloFor.escopo && !simboloFor.vetor){
                     if(auxDeleteTable.id == simboloFor.id  && auxDeleteTable.tipo == simboloFor.tipo  && auxDeleteTable.escopo <= simboloFor.escopo){
                         varInit = simboloFor;
                         cout<<"to ak "<< varInit.id<<endl;
@@ -194,7 +196,6 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                 valorAtrRev.push(valorAtr.top());
                 valorAtr.pop();
                 }
-
                     cout<<"\n 218 line \n";
 
                 if(!valorAtrRev.empty()){
@@ -570,19 +571,29 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                      tabelaSimboloAuxDelete.push_front(auxDeleteTable);
                      if(lexema == simboloFor.id && simboloFor.usado){
                     cout<< "variavelfoi usada";
+                    vetorOperando.push(lexema);
+                    VarExiste = true;
                     tipoUsado = ConverteTipo(simboloVar.tipo);
                      }else if(lexema == simboloFor.id && escopo.size() >= simboloFor.escopo){
                     if(auxDeleteTable.id == simboloFor.id  && auxDeleteTable.tipo == simboloFor.tipo  && auxDeleteTable.escopo <= simboloFor.escopo && simboloFor.posVetor >= tamVetor){
                         simboloFor.usado = true;
+                        VarExiste = true;
                         tabelaSimboloAuxDelete.pop_front();
                         tabelaSimboloAuxDelete.push_front(simboloFor);
                         tipoUsado = ConverteTipo(simboloVar.tipo);
+                        vetorOperando.push(lexema);
                     }
                      }
                      tabelaSimbolo.pop_front();
             }
+            auxOperacaoVetor1 = valorAtr.size();
             tabelaSimbolo.swap(tabelaSimboloAuxDelete);
             tabelaSimboloAuxDelete.clear();
+            if(VarExiste){
+                     VarExiste = false;
+                     break;
+            }
+            throw SemanticError("Vetor nao exite", token->getPosition());
             break;
 
 
@@ -620,8 +631,59 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
 
         case 28:
             posVetor = stoi(lexema);
+            diferencaValorAtrVetor = valorAtr.size() -auxOperacaoVetor1;
 
-            if(auxOperadoresUsados.empty()){
+            for (int i = 0; i <= diferencaValorAtrVetor; i++) {
+                     valorAtrRev.push(valorAtr.top());
+                     valorAtr.pop();
+            }
+
+            if(!vetorOperando.empty()){
+                     if(valorAtrRev.size() == 1){
+                    if(isNumeric(valorAtrRev.top())){
+                        text.append("\n LDI ");
+                        text.append(valorAtrRev.top());
+                        valorAtrRev.pop();
+                    }else{
+                        text.append("\n LD ");
+                        text.append(valorAtrRev.top());
+                        valorAtrRev.pop();
+                    }
+
+                     }else{
+
+                     for (int i = 0; i <= diferencaValorAtrVetor; i++) {
+                    if(auxOperadoresUsados.top() == 1){
+                    if(isNumeric(valorAtrRev.top())){
+                        text.append("\n SUBI ");
+                        text.append(valorAtrRev.top());
+                        valorAtrRev.pop();
+                    }else{
+                        text.append("\n SUB ");
+                        text.append(valorAtrRev.top());
+                        valorAtrRev.pop();
+                    }
+                     }else if(auxOperadoresUsados.top() == 0){
+                    if(isNumeric(valorAtrRev.top()) ){
+                        text.append("\n ADDI ");
+                        text.append(valorAtrRev.top());
+                        valorAtrRev.pop();
+                    }else{
+                        text.append("\n ADD ");
+                        text.append(valorAtrRev.top());
+                        valorAtrRev.pop();
+                    }
+                     }
+                     auxOperadoresUsados.pop();
+                     }
+                     }
+                     text.append("\n STO $INDR");
+                     text.append("\n LDV ");
+                     text.append(vetorOperando.top());
+                     vetorOperando.pop();
+            }
+
+            if(auxOperadoresUsados.empty() && !valorAtr.empty()){
                      if(isNumeric(valorAtr.top())){
                     text.append("\n LDI ");
                     text.append(valorAtr.top());
@@ -630,24 +692,12 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                     text.append(valorAtr.top());
                      }
                      valorAtr.pop();
-                     /*
-                      * if(auxTextVetor.size() == 1){
-                    text.append("\n STO $INDR");
-                    *text.append("\n LDV ");
-                    text.append(auxTextVetor.top());
-                    auxTextVetor.pop();*
-                     }*/
                      temporarioUsado.push(temporarioDisponivel.top());
                      temporarioDisponivel.pop();
                      text.append("\n STO ");
                      text.append(to_string(temporarioUsado.top()));
 
             };
-
-            while(!valorAtr.empty()){
-                     valorAtrRev.push(valorAtr.top());
-                     valorAtr.pop();
-            }
 
             if(!valorAtrRev.empty()){
 
