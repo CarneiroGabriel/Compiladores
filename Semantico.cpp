@@ -20,7 +20,7 @@ bool isNumeric(std::string const &str)
 }
 
 SemanticTable TabelaSemantica;
-Simbolo simboloVar; // usada pra auxiliar em inserções na tabela
+Simbolo simboloVar; // usada pra auxiliar em inser??es na tabela
 Simbolo varInit; // usada pra iniciar variavel
 Simbolo auxDeleteTable;// auxiliar para deletar simbolos repetidos da tabela
 Warning warning;
@@ -71,7 +71,7 @@ int ConverteTipo(string tipo){
 
 void Semantico::executeAction(int action, const Token *token) throw (SemanticError)
 {
-    cout << "Ação: " << action << ", Token: "  << token->getId()
+    cout << "A??o: " << action << ", Token: "  << token->getId()
          << ", Lexema: " << token->getLexeme() << endl;
 
     simboloVar.escopo = escopo.empty() ? escopo.size(): 0;
@@ -193,6 +193,9 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
 
         case 5:
 
+                cout<<"tamanho do auxOperadores "<<auxOperadoresUsados.size()<<endl;
+
+
                 while(!valorAtr.empty()){
                 valorAtrRev.push(valorAtr.top());
                 valorAtr.pop();
@@ -307,9 +310,15 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                 }else{
                     if(!temporarioUsado.empty()){
 
+                    cout<<"tamanho do auxOperadores "<<auxOperadoresUsados.size()<<endl;
+
                     while(!temporarioUsado.empty()){
-                        auxAtribuirVetorVar.push(temporarioUsado.top());
+                        auxTemporario.push(temporarioUsado.top());
                         temporarioUsado.pop();
+                    }
+                    while(!auxTemporario.empty()){
+                        auxAtribuirVetorVar.push(auxTemporario.top());
+                        auxTemporario.pop();
                     }
 
                     while(!auxOperadoresUsados.empty()){
@@ -664,6 +673,7 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
             posVetor = stoi(lexema);
             diferencaValorAtrVetor = valorAtr.size() -auxOperacaoVetor1;
 
+            cout<<"tamanho do auxOperadores 28 "<<auxOperadoresUsados.size()<<endl;
             for (int i = 0; i < diferencaValorAtrVetor; i++) {
                      valorAtrRev.push(valorAtr.top());
                      valorAtr.pop();
@@ -682,6 +692,7 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                     }
 
                      if(!valorAtrRev.empty()){
+                        cout<<"chegou aqui valor atr !empty 28";
 
                      for (int i = 1; i < diferencaValorAtrVetor; i++) {
                     if(auxOperadoresUsados.top() == 1){
@@ -713,11 +724,12 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                      text.append(vetorOperando.top());
                      vetorOperando.pop();
 
-                     if(auxOperadoresUsados.empty() ){
+                     if(diferencaValorAtrVetor == 1 && temporarioUsado.empty()){}else{
                      temporarioUsado.push(temporarioDisponivel.top());
                      temporarioDisponivel.pop();
                      text.append("\n STO ");
                      text.append(to_string(temporarioUsado.top()));
+                     break;
 
                      };
 
