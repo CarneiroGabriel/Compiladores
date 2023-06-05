@@ -213,6 +213,15 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                         text.append(valorAtrRev.top());
                         valorAtrRev.pop();
                     }
+                    if(!temporarioUsado.empty()){
+                        text.append("\n STO ");
+                        text.append(to_string(temporarioDisponivel.top()));
+                        cout<< "\n tamanho temporario disponiveis"<< temporarioDisponivel.size();
+                        temporarioUsado.push(temporarioDisponivel.top());
+
+                        temporarioDisponivel.pop();
+
+                    }
                     while(!valorAtrRev.empty()){
                         if(auxOperadoresUsados.top() == 1){
                             if(isNumeric(valorAtrRev.top())){
@@ -243,7 +252,7 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                     cout<<"\n 256 line \n";
 
 
-                    if(temporarioUsado.size() >= 3){
+                   /* if(temporarioUsado.size() >= 3){
                     auxTemp0 =temporarioUsado.top();
                     temporarioUsado.pop();
                     auxTemp1 =temporarioUsado.top();
@@ -251,7 +260,7 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                     temporarioUsado.push(auxTemp0);
                     temporarioUsado.push(auxTemp1);
 
-                }
+                }*/
 
 
                 if(!auxTextVetor.empty()){
@@ -265,6 +274,10 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                         auxTextVetor.push(to_string(auxTemporario.top()));
                         auxTemporario.pop();
                     }
+
+                    text.append("\n LD ");
+                    text.append(auxTextVetor.top());
+                    auxTextVetor.pop();
 
 
                     while (!auxTextVetor.empty()) {
@@ -287,6 +300,7 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                         }else{
                         text.append("\n STO ");
                         text.append(to_string(temporarioDisponivel.top()));
+                        cout<< "\n tamanho temporario disponiveis"<< temporarioDisponivel.size();
                         temporarioUsado.push(temporarioDisponivel.top());
                         temporarioDisponivel.pop();
                         break;
@@ -313,13 +327,13 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                     cout<<"tamanho do auxOperadores "<<auxOperadoresUsados.size()<<endl;
 
                     while(!temporarioUsado.empty()){
-                        auxTemporario.push(temporarioUsado.top());
+                        auxOperadoresUsados.push(temporarioUsado.top());
                         temporarioUsado.pop();
                     }
-                    while(!auxTemporario.empty()){
+                    /*while(!auxTemporario.empty()){
                         auxAtribuirVetorVar.push(auxTemporario.top());
                         auxTemporario.pop();
-                    }
+                    }*/
 
                     while(!auxOperadoresUsados.empty()){
                         text.append("\n LD ");
