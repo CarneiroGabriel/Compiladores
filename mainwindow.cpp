@@ -242,3 +242,26 @@ void MainWindow::on_BipsMipsBtn_clicked()
     }
 }
 
+
+void MainWindow::on_pushButton_2_clicked()
+{
+
+    QString filename= QFileDialog::getSaveFileName(this, "Salvar arquivo", "*.asm");
+
+    if (filename.isEmpty())
+         return;
+
+    QFile file(filename);
+
+
+    //Open the file
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+         return;
+
+    QTextStream out(&file);
+
+    out << ui->BipMips->toPlainText() << "\n";
+
+    file.close();
+}
+

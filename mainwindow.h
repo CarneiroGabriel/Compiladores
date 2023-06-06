@@ -34,6 +34,8 @@ private slots:
 
     void on_BipsMipsBtn_clicked();
 
+    void on_pushButton_2_clicked();
+
 private:
     Ui::MainWindow *ui;
 };
