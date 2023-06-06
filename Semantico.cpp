@@ -252,18 +252,20 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                     cout<<"\n 256 line \n";
 
 
-                    if(temporarioUsado.size() >= 3){
-                    auxTemp0 =temporarioUsado.top();
-                    temporarioUsado.pop();
-                    auxTemp1 =temporarioUsado.top();
-                    temporarioUsado.pop();
-                    temporarioUsado.push(auxTemp0);
-                    temporarioUsado.push(auxTemp1);
 
-                }
 
 
                 if(!auxTextVetor.empty()){
+
+                    if(temporarioUsado.size() >= 3){
+                        auxTemp0 =temporarioUsado.top();
+                        temporarioUsado.pop();
+                        auxTemp1 =temporarioUsado.top();
+                        temporarioUsado.pop();
+                        temporarioUsado.push(auxTemp0);
+                        temporarioUsado.push(auxTemp1);
+
+                    }
 
                     cout<<"\n 277 line \n";
                     while(!temporarioUsado.empty()){
@@ -324,6 +326,16 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                     auxTextVetor.pop();
                     }
                 }else{
+
+                    if(temporarioUsado.size() >= 2){
+                    auxTemp0 =temporarioUsado.top();
+                    temporarioUsado.pop();
+                    auxTemp1 =temporarioUsado.top();
+                    temporarioUsado.pop();
+                    temporarioUsado.push(auxTemp0);
+                    temporarioUsado.push(auxTemp1);
+
+                    }
                     if(!temporarioUsado.empty()){
 
                     cout<<"tamanho do auxOperadores "<<auxOperadoresUsados.size()<<endl;
