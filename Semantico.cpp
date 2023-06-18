@@ -58,7 +58,7 @@ int auxOperacaoVetor2;
 bool VarExiste;
 bool varUsadaPropria;
 
-string descobreBranch(string rel){
+string descobreBranchIf(string rel){
     if(rel == ">"){
         return "\n BLT";
     }else if(rel == "<"){
@@ -71,6 +71,22 @@ string descobreBranch(string rel){
         return "\n BNE";
     }else if(rel == "!="){
         return "\n BEQ";
+    }
+}
+
+string descobreBranchWhile(string rel){
+    if(rel == ">"){
+        return "\n BGT";
+    }else if(rel == "<"){
+        return "\n BLT";
+    }else if(rel == ">="){
+        return "\n BGE";
+    }else if(rel == "<="){
+        return "\n BLE";
+    }else if(rel == "=="){
+        return "\n BEQ";
+    }else if(rel == "!="){
+        return "\n BNE";
     }
 
 
@@ -1021,7 +1037,7 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
         case 37:
             controleRotulos++;
             rotulos.push_front(controleRotulos);
-            oprel = descobreBranch(oprel);
+            oprel = descobreBranchIf(oprel);
             text.append(oprel);
             text.append(" R");
             text.append(to_string(controleRotulos));
@@ -1053,8 +1069,49 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
 
             break;
 
+        case 41:
+            controleRotulos++;
+            rotulos.push_front(controleRotulos);
+            text.append("\n \t R");
+            text.append(to_string(controleRotulos));
+            text.append(" :");
+            break;
 
+        case 42:
+            controleRotulos++;
+            rotulos.push_front(controleRotulos);
+            oprel = descobreBranchIf(oprel);
+            text.append(oprel);
+            text.append(" R");
+            text.append(to_string(controleRotulos));
+            break;
 
+        case 43:
+            controleRotulos--;
+            rotulos.pop_front();
+            text.append("\n JMP");
+            text.append(" R");
+            text.append(to_string(controleRotulos));
+            controleRotulos++;
+            rotulos.push_front(controleRotulos);
+            text.append("\n \t R");
+            text.append(to_string(controleRotulos));
+            break;
+
+        case 44:
+            controleRotulos++;
+            rotulos.push_front(controleRotulos);
+            text.append("\n \t R");
+            text.append(to_string(controleRotulos));
+            text.append(" :");
+            break;
+
+        case 45:
+            oprel = descobreBranchWhile(oprel);
+            text.append(oprel);
+            text.append(" R");
+            text.append(to_string(controleRotulos));
+            break;
 
     }
 
