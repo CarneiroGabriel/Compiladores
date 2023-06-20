@@ -1113,6 +1113,34 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
             text.append(to_string(controleRotulos));
             break;
 
+        case 46:
+            controleRotulos++;
+            rotulos.push_front(controleRotulos);
+            text.append("\n \t R");
+            text.append(to_string(controleRotulos));
+            text.append(" :");
+            break;
+        case 47:
+
+            controleRotulos++;
+            rotulos.push_front(controleRotulos);
+            oprel = descobreBranchWhile(oprel);
+            text.append(oprel);
+            text.append(" R");
+            text.append(to_string(controleRotulos));
+            break;
+        case 50:
+            controleRotulos--;
+            rotulos.pop_front();
+            text.append("\n JMP R");
+            text.append(to_string(controleRotulos));
+
+            controleRotulos++;
+            rotulos.push_front(controleRotulos);
+            text.append("\n \t R");
+            text.append(to_string(controleRotulos));
+            text.append(" :");
+            break;
     }
 
 }
