@@ -39,6 +39,7 @@ stack<int> auxTemporario;
 stack<int> auxAtribuirVetorVar;
 list<int> rotulos;
 string oprel;
+string textTemp;
 int controleRotulos;
 int contador;
 int posVetor;
@@ -1129,7 +1130,65 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
             text.append(" R");
             text.append(to_string(controleRotulos));
             break;
+
+        case 48:
+
+            while(!valorAtr.empty()){
+                valorAtrRev.push(valorAtr.top());
+                valorAtr.pop();
+            }
+
+            if(!valorAtrRev.empty()){
+
+                if(isNumeric(valorAtrRev.top())){
+                    textTemp.append("\n LDI ");
+                    textTemp.append(valorAtrRev.top());
+                    valorAtrRev.pop();
+                }else{
+                    textTemp.append("\n LD ");
+                    textTemp.append(valorAtrRev.top());
+                    valorAtrRev.pop();
+                }
+                if(!temporarioUsado.empty() && !auxOperadoresUsados.empty() && valorAtrRev.empty()){
+                    textTemp.append("\n STO ");
+                    textTemp.append(to_string(temporarioDisponivel.top()));
+                    cout<< "\n tamanho temporario disponiveis"<< temporarioDisponivel.size();
+                    temporarioUsado.push(temporarioDisponivel.top());
+
+                    temporarioDisponivel.pop();
+
+                }
+                while(!valorAtrRev.empty()){
+                    if(auxOperadoresUsados.top() == 1 || auxOperadoresUsados.top() == 5){
+                        if(isNumeric(valorAtrRev.top())){
+                        textTemp.append("\n SUBI ");
+                        textTemp.append(valorAtrRev.top());
+                        valorAtrRev.pop();
+                        }else{
+                        textTemp.append("\n SUB ");
+                        textTemp.append(valorAtrRev.top());
+                        valorAtrRev.pop();
+                        }
+                    }else if(auxOperadoresUsados.top() == 0){
+                        if(isNumeric(valorAtrRev.top()) ){
+                        textTemp.append("\n ADDI ");
+                        textTemp.append(valorAtrRev.top());
+                        valorAtrRev.pop();
+                        }else{
+                        textTemp.append("\n ADD ");
+                        textTemp.append(valorAtrRev.top());
+                        valorAtrRev.pop();
+                        }
+                    }
+                    auxOperadoresUsados.pop();
+                }
+
+            }
+            break;
+
         case 50:
+            text.append(textTemp);
+            textTemp.clear();
             controleRotulos--;
             rotulos.pop_front();
             text.append("\n JMP R");
