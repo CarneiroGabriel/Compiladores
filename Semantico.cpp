@@ -1159,7 +1159,7 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
 
                 }
                 while(!valorAtrRev.empty()){
-                    if(auxOperadoresUsados.top() == 1 || auxOperadoresUsados.top() == 5){
+                    if(auxOperadoresUsados.top() == 1){
                         if(isNumeric(valorAtrRev.top())){
                         textTemp.append("\n SUBI ");
                         textTemp.append(valorAtrRev.top());
