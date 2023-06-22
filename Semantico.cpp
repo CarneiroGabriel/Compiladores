@@ -40,6 +40,7 @@ stack<int> auxAtribuirVetorVar;
 list<int> rotulos;
 string oprel;
 string textTemp;
+string nomeFun;
 int controleRotulos;
 int contador;
 int posVetor;
@@ -603,8 +604,13 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                      simboloVar.escopo = escopo.size();
                      tabelaSimbolo.push_front(simboloVar);
                      simboloVar.funcao = false;
+                     nomeFun = lexema;
                      break;
             }
+            nomeFun = lexema;
+            text.append("\n \t");
+            text.append(lexema);
+            text.append(" :");
             break;
 
         case 21:
@@ -715,6 +721,7 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                     //talvez precisa de um continue para o for
                     simboloVar.parametro = true;
                     simboloVar.id = lexema;
+                    simboloVar.nomeFun = nomeFun;
                     simboloVar.escopo = escopo.size() + 1;
                     tabelaSimbolo.push_front(simboloVar);
                     simboloVar.parametro = false;
@@ -893,6 +900,27 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
             }*/
 
             for (auto it = tabelaSimbolo.rbegin(); it != tabelaSimbolo.rend(); ++it){
+                if(it->funcao == 1){continue;}
+                data.append(it->id);
+                if(it->posVetor != 0){
+                    data.append(" : 0");
+                    for(int i = 1; i< it->posVetor;i++){
+                        data.append(",0");
+                    }
+                    data.append("\n");
+                }else if(it->valor != 0){
+                    data.append(": ");
+                    data.append(to_string(it->valor));
+                    data.append("\n");
+                }else{
+                    data.append(" : 0 \n");
+                }
+
+            }
+
+            for (auto it = tabelaSimboloFuncoes.rbegin(); it != tabelaSimboloFuncoes.rend(); ++it){
+                data.append(it->nomeFun);
+                data.append("_");
                 data.append(it->id);
                 if(it->posVetor != 0){
                     data.append(" : 0");

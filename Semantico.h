@@ -14,6 +14,7 @@ class Simbolo{
 public:
     string tipo;
     string id;
+    string nomeFun;
     bool inicializado = false;
     bool usado = false;
     bool parametro = false;
