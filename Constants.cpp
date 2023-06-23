@@ -137,7 +137,7 @@ int SPECIAL_CASES_VALUES[28] =
 
 const char *SCANNER_ERROR[STATES_COUNT] =
 {
-        "Caractere n„o esperado",
+        "Caractere n√£o esperado",
         "",
         "",
         "Erro identificando STRING_LIT",

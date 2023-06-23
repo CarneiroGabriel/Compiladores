@@ -1244,9 +1244,7 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
             break;
 
         case 52:
-            auxTextFun = tabelaSimboloFuncoes.front();
-            text.append("\n STO ");
-            text.append(auxTextFun.id);
+
             text.append("\n CALL ");
             text.append(textTemp);
             break;
@@ -1272,8 +1270,15 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                     text.append(valorAtrRev.top());
                     valorAtrRev.pop();
                 }
+                auxTextFun = tabelaSimboloFuncoes.front();
+                text.append("\n STO ");
+                text.append(auxTextFun.id);
             }
             break;
+
+        /*case 55:
+            text.append("\n JMP Main ");
+            break;*/
 
     }
 
