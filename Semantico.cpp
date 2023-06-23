@@ -25,6 +25,7 @@ SemanticTable TabelaSemantica;
 Simbolo simboloVar; // usada pra auxiliar em inser??es na tabela
 Simbolo varInit; // usada pra iniciar variavel
 Simbolo auxDeleteTable;// auxiliar para deletar simbolos repetidos da tabela
+Simbolo auxTextFun;
 Warning warning;
 list<Simbolo> tabelaSimboloAuxDelete;// auxiliar para deletar simbolos repetidos da tabela
 stack< string> valorAtr;
@@ -724,7 +725,10 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                     //inserir registro na lista de simbolos
                     //talvez precisa de um continue para o for
                     simboloVar.parametro = true;
-                    simboloVar.id = lexema;
+                    simboloVar.id = "";
+                    simboloVar.id.append(nomeFun);
+                    simboloVar.id.append("_");
+                    simboloVar.id.append(lexema);
                     simboloVar.nomeFun = nomeFun;
                     simboloVar.escopo = escopo.size() + 1;
                     tabelaSimbolo.push_front(simboloVar);
@@ -734,7 +738,9 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
             }
             if(tabelaSimbolo.empty()){
                      simboloVar.parametro = true;
-                     simboloVar.id = lexema;
+                     simboloVar.id.append(nomeFun);
+                     simboloVar.id.append("_");
+                     simboloVar.id.append(lexema);
                      simboloVar.escopo = escopo.size() + 1;
                      tabelaSimbolo.push_front(simboloVar);
                      simboloVar.parametro = false;
@@ -923,8 +929,8 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
             }
 
             for (auto it = tabelaSimboloFuncoes.rbegin(); it != tabelaSimboloFuncoes.rend(); ++it){
-                data.append(it->nomeFun);
-                data.append("_");
+                /*data.append(it->nomeFun);
+                data.append("_");*/
                 data.append(it->id);
                 if(it->posVetor != 0){
                     data.append(" : 0");
@@ -1238,6 +1244,9 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
             break;
 
         case 52:
+            auxTextFun = tabelaSimboloFuncoes.front();
+            text.append("\n STO ");
+            text.append(auxTextFun.id);
             text.append("\n CALL ");
             text.append(textTemp);
             break;
