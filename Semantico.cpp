@@ -605,6 +605,9 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                      tabelaSimbolo.push_front(simboloVar);
                      simboloVar.funcao = false;
                      nomeFun = lexema;
+                     text.append("\n \t");
+                     text.append(lexema);
+                     text.append(" :");
                      break;
             }
             nomeFun = lexema;
@@ -643,6 +646,7 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
             tabelaSimbolo.swap(tabelaSimboloAuxDelete);
             tabelaSimboloAuxDelete.clear();
             if(VarExiste){
+                     textTemp = lexema;
                      VarExiste = false;
                      break;
             }
@@ -1228,6 +1232,40 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
             text.append(to_string(controleRotulos));
             text.append(" :");
             break;
+
+        case 51:
+            text.append("\n \t Main :");
+            break;
+
+        case 52:
+            text.append("\n CALL ");
+            text.append(textTemp);
+            break;
+        case 53:
+            //gera retorno funcao
+            break;
+        case 54:
+            //lista termo
+            while(!valorAtr.empty()){
+                valorAtrRev.push(valorAtr.top());
+                valorAtr.pop();
+            }
+            cout<<"\n 1253 line \n";
+
+            while(!valorAtrRev.empty()){
+
+                if(isNumeric(valorAtrRev.top())){
+                    text.append("\n LDI ");
+                    text.append(valorAtrRev.top());
+                    valorAtrRev.pop();
+                }else{
+                    text.append("\n LD ");
+                    text.append(valorAtrRev.top());
+                    valorAtrRev.pop();
+                }
+            }
+            break;
+
     }
 
 }
