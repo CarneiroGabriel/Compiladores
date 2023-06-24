@@ -1275,6 +1275,11 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
 
                 if(simboloFor.id.find(textTemp) == 0){
 
+                    if(valorAtr.empty()){
+                        text.append("\n Atribuido menos variaveis que o necessario");
+                        break;
+                    }
+
                 if(isNumeric(valorAtr.top())){
                     text.append("\n LDI ");
                     text.append(valorAtr.top());
@@ -1289,6 +1294,13 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                         text.append(simboloFor.id);
                     }
                 }
+
+            if(!valorAtr.empty()){
+                    text.append("\n Atribuidas mais variaveis que o necessario ");
+                    while(!valorAtr.empty()){
+                        valorAtr.pop();
+                        }
+                    }
 
             break;
 
