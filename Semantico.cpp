@@ -606,6 +606,7 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                      tabelaSimbolo.push_front(simboloVar);
                      simboloVar.funcao = false;
                      nomeFun = lexema;
+                     text.append("\n JMP Main");
                      text.append("\n \t");
                      text.append(lexema);
                      text.append(" :");
@@ -1270,9 +1271,14 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                     text.append(valorAtrRev.top());
                     valorAtrRev.pop();
                 }
-                auxTextFun = tabelaSimboloFuncoes.front();
-                text.append("\n STO ");
-                text.append(auxTextFun.id);
+
+                for (const Simbolo &simboloFor : tabelaSimboloFuncoes){
+                    if(simboloFor.id.find(textTemp, 0)){
+                        text.append("\n STO ");
+                        text.append(simboloFor.id);
+                        break;
+                    }
+                }
             }
             break;
 
