@@ -42,6 +42,7 @@ list<int> rotulos;
 string oprel;
 string textTemp;
 string nomeFun;
+string param;
 int controleRotulos;
 int contador;
 int posVetor;
@@ -150,6 +151,9 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
             break;
 
         case 3:
+            param = nomeFun.append("_");
+            param.append(lexema);
+
             for (Simbolo simboloFor : tabelaSimbolo){
                 auxDeleteTable = tabelaSimbolo.front();
                 tabelaSimboloAuxDelete.push_front(auxDeleteTable);
@@ -157,8 +161,6 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                     cout<< "variavelfoi usada";
                     tipoUsado = ConverteTipo(simboloFor.tipo);
                     atributosUsados.push(tipoUsado);
-                    valorAtr.push(lexema);
-                    cout<<"Lexema caso 3 : "<<valorAtr.top();
                     VarExiste = true;
                     if(!simboloFor.inicializado){
                         warning.id = simboloFor.id;
@@ -174,8 +176,7 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                         simboloFor.usado = true;
                         tabelaSimboloAuxDelete.pop_front();
                         tabelaSimboloAuxDelete.push_front(simboloFor);
-                        tipoUsado = ConverteTipo(simboloFor.tipo);
-                        valorAtr.push(lexema);
+                        tipoUsado = ConverteTipo(simboloFor.tipo);                      
                         VarExiste = true;
                         if(!simboloFor.inicializado){
                             warning.id = simboloFor.id;
@@ -184,23 +185,29 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
                             listaWar.push_front(warning);
                         }
                     }
+                }else if(param == simboloFor.id && simboloFor.parametro){
+                    VarExiste= true;
                 }
                 tabelaSimbolo.pop_front();
             }
+
+
             if(varInit.id == lexema && !varInit.vetor){
                 tipoUsado = ConverteTipo(varInit.tipo);
                 atributosUsados.push(tipoUsado);
                 varInit.usado = true;
-                valorAtr.push(lexema);
                 VarExiste = true;
                 varUsadaPropria = false;
 
             }
 
 
+
+
             tabelaSimbolo.swap(tabelaSimboloAuxDelete);
             tabelaSimboloAuxDelete.clear();
             if(VarExiste){
+                valorAtr.push(lexema);
                 VarExiste = false;
                 break;
             }
@@ -1250,41 +1257,44 @@ void Semantico::executeAction(int action, const Token *token) throw (SemanticErr
             text.append(textTemp);
             break;
         case 53:
+
+            text.append("\n LD ");
+            text.append(param);
+
             //gera retorno funcao
             break;
         case 54:
             //lista termo
-            while(!valorAtr.empty()){
+            /*while(!valorAtr.empty()){
                 valorAtrRev.push(valorAtr.top());
                 valorAtr.pop();
-            }
+            }*/
             cout<<"\n 1253 line \n";
 
-            while(!valorAtrRev.empty()){
+            for (const Simbolo &simboloFor : tabelaSimboloFuncoes){
 
-                if(isNumeric(valorAtrRev.top())){
+                if(simboloFor.id.find(textTemp) == 0){
+
+                if(isNumeric(valorAtr.top())){
                     text.append("\n LDI ");
-                    text.append(valorAtrRev.top());
-                    valorAtrRev.pop();
+                    text.append(valorAtr.top());
+                    valorAtr.pop();
                 }else{
                     text.append("\n LD ");
-                    text.append(valorAtrRev.top());
-                    valorAtrRev.pop();
+                    text.append(valorAtr.top());
+                    valorAtr.pop();
                 }
 
-                for (const Simbolo &simboloFor : tabelaSimboloFuncoes){
-                    if(simboloFor.id.find(textTemp, 0)){
                         text.append("\n STO ");
                         text.append(simboloFor.id);
-                        break;
                     }
                 }
-            }
+
             break;
 
-        /*case 55:
-            text.append("\n JMP Main ");
-            break;*/
+        case 55:
+            valorAtr.pop();
+            break;
 
     }
 
